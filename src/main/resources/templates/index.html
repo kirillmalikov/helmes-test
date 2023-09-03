@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+        }
+        select {
+            font-family: Arial, sans-serif;
+        }
+        #save-button {
+            width: 80px;
+            height: 30px;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+        }
+        body.light-mode {
+            background-color: #ffffff;
+            color: #000000;
+        }
+        body.dark-mode {
+            background-color: #121212;
+            color: #FFFFFF80;
+        }
+        body.dark-mode input {
+            background-color: #333333;
+            color: #FFFFFF80;
+        }
+        body.dark-mode select {
+            background-color: #333333;
+            color: #FFFFFF80;
+        }
+        #theme-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="light-mode">
+<form th:action="@{/save}" th:method="POST" th:object="${user}">
+    <title th:if="${user.getId() != null}">Edit User</title>
+    <title th:unless="${user.getId() != null}">Create User</title>
+    Please enter your name and pick the Sectors you are currently involved in.
+    <br><br>
+    Name:
+    <input type="text" th:field="*{name}" required minlength="2" maxlength="30" id="name-input">
+    <br><br>
+    Sectors:
+    <select multiple="multiple" name="sectors" size="20" required>
+        <option th:each="sector : ${sectors}"
+                th:value="${sector.getId()}"
+                th:utext="${#strings.replace(sector.getName(), ' ', '&nbsp;')}"
+                th:selected="${#lists.contains(user.sectors.![id], sector.id)}">
+        </option>
+    </select>
+    <br><br>
+    <input type="checkbox" id="agree" th:checked="${user.agreedToTerms != null}" required>
+    Agree to terms
+    <br><br>
+    <input type="hidden" th:field="*{id}">
+    <input type="submit" value="Save" id="save-button">
+</form>
+<button id="theme-toggle">Toggle Theme</button>
+<script>
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
+
+    themeToggle.addEventListener('click', () => {
+        if (body.classList.contains('light-mode')) {
+            body.classList.remove('light-mode');
+            body.classList.add('dark-mode');
+            localStorage.setItem('selectedTheme', 'dark');
+        } else {
+            body.classList.remove('dark-mode');
+            body.classList.add('light-mode');
+            localStorage.setItem('selectedTheme', 'light');
+        }
+    });
+
+    const storedTheme = localStorage.getItem('selectedTheme');
+    if (storedTheme === 'dark') {
+        body.classList.remove('light-mode');
+        body.classList.add('dark-mode');
+    }
+</script>
+</body>
+</html>
